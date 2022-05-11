@@ -7,8 +7,135 @@ import {
   CardTitle,
   Breadcrumb,
   BreadcrumbItem,
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  Form,
+  FormGroup,
+  Input,
+  Label,
+  Col,
+  FormFeedback,
 } from "reactstrap";
 import { Link } from "react-router-dom";
+
+class CommentForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isModalOpen: false,
+      rating: "1",
+      author: "",
+      comment: "",
+      touched: {
+        author: false,
+      },
+    };
+    this.toggleModal = this.toggleModal.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+  }
+
+  handleBlur = (field) => (evt) => {
+    this.setState({
+      touched: { ...this.state.touched, [field]: true },
+    });
+  };
+
+  toggleModal() {
+    this.setState({
+      isModalOpen: !this.state.isModalOpen,
+    });
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value,
+    });
+  }
+
+  validate(author) {
+    const errors = {
+      author: "",
+    };
+
+    if (this.state.touched.author && author.length < 3)
+      errors.author = "Must be greater than 2 characters";
+    else if (this.state.touched.author && author.length > 15)
+      errors.author = "Must be 15 characters or less";
+
+    return errors;
+  }
+
+  render() {
+    const errors = this.validate(this.state.author);
+    return (
+      <div>
+        <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
+          <ModalHeader toggle={this.toggleModal}>Submit Comment</ModalHeader>
+          <ModalBody>
+            <Form onSubmit={this.handleLogin}>
+              <FormGroup>
+                <Col>
+                  <Label htmlFor="rating">Rating</Label>
+                  <Input
+                    type="select"
+                    id="rating"
+                    name="rating"
+                    value={this.state.rating}
+                    onChange={this.handleInputChange}
+                  >
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                  </Input>
+                </Col>
+                <Label htmlFor="name">Your Name</Label>
+                <Input
+                  type="text"
+                  id="author"
+                  name="author"
+                  valid={errors.author === ""}
+                  invalid={errors.author !== ""}
+                  onBlur={this.handleBlur("author")}
+                  onChange={this.handleInputChange}
+                />
+                <FormFeedback>{errors.author}</FormFeedback>
+              </FormGroup>
+              <FormGroup>
+                <Label htmlFor="message">Comment</Label>
+                <Col>
+                  <Input
+                    type="textarea"
+                    id="comment"
+                    name="comment"
+                    rows="6"
+                    value={this.state.comment}
+                    onChange={this.handleInputChange}
+                  ></Input>
+                </Col>
+              </FormGroup>
+
+              <Button type="submit" value="submit" color="primary">
+                Submit
+              </Button>
+            </Form>
+          </ModalBody>
+        </Modal>
+
+        <Button outline onClick={this.toggleModal}>
+          <span className="fa fa-sign-in fa-lg"></span> Submit Comment
+        </Button>
+      </div>
+    );
+  }
+}
 
 class Dishdetail extends Component {
   constructor(props) {
@@ -19,14 +146,11 @@ class Dishdetail extends Component {
     if (dish != null)
       return (
         <Card>
-                  
           <CardImg top src={dish.image} alt={dish.name} />
-                   
           <CardBody>
             <CardTitle>{dish.name}</CardTitle>
-            <CardText>{dish.description}</CardText>              
+            <CardText>{dish.description}</CardText>
           </CardBody>
-                       
         </Card>
       );
     else return <div></div>;
@@ -63,6 +187,7 @@ class Dishdetail extends Component {
               })}
             </ul>
           </CardBody>
+          <CommentForm />
         </Card>
       );
     } else return <div></div>;
