@@ -10,6 +10,7 @@ import { connect } from "react-redux";
 import { COMMENTS } from "../shared/comments";
 import { PROMOTIONS } from "../shared/promotions";
 import { LEADERS } from "../shared/leaders";
+import Dishdetail from "./DishsdetailComponent";
 const mapStateToProps = (state) => {
   return {
     dishes: state.dishes,
@@ -44,6 +45,15 @@ class Main extends Component {
         />
       );
     };
+    const DishWithId = ({ match }) => {
+      return (
+        <Dishdetail
+          comments={this.props.comments}
+          dishes={this.props.dishes}
+          selectedDish={match.params.dishId}
+        />
+      );
+    };
 
     return (
       <div>
@@ -55,19 +65,20 @@ class Main extends Component {
             path="/menu"
             component={() => (
               <Menu
-                dishes={this.state.dishes}
-                comments={this.state.comments.filter((comment) => {
-                  return comment.dishId === this.state.selectedDish;
-                })}
-                selectedDish={
-                  this.state.dishes.filter((dish) => {
-                    return dish.id === this.state.selectedDish;
-                  })[0]
-                }
-                onClick={(dishId) => this.onDishSelect(dishId)}
+                dishes={this.props.dishes}
+                // comments={this.state.comments.filter((comment) => {
+                //   return comment.dishId === this.state.selectedDish;
+                // })}
+                // selectedDish={
+                //   this.state.dishes.filter((dish) => {
+                //     return dish.id === this.state.selectedDish;
+                //   })[0]
+                // }
+                // onClick={(dishId) => this.onDishSelect(dishId)}
               />
             )}
           />
+          <Route path="/menu/:dishId" component={DishWithId} />
           <Route exact path="/contactus" component={Contact} />
           <Redirect to="/home" />
         </Switch>

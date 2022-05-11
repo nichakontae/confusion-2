@@ -2,66 +2,94 @@ import React, { Component } from "react";
 import {
   Card,
   CardImg,
-  CardImgOverlay,
   CardText,
   CardBody,
   CardTitle,
+  Breadcrumb,
+  BreadcrumbItem,
 } from "reactstrap";
+import { Link } from "react-router-dom";
 
 class Dishdetail extends Component {
   constructor(props) {
     super(props);
   }
-  renderDish(dish) {
+  renderDish() {
+    const dish = this.props.dishes[this.props.selectedDish];
     if (dish != null)
       return (
-        <div className="col-12 col-md-5 mx-1 my-1">
-          <Card>
-                    
-            <CardImg top src={dish.image} alt={dish.name} />
-                     
-            <CardBody>
-              <CardTitle>{dish.name}</CardTitle>
-              <CardText>{dish.description}</CardText>              
-            </CardBody>
-                         
-          </Card>
-        </div>
+        <Card>
+                  
+          <CardImg top src={dish.image} alt={dish.name} />
+                   
+          <CardBody>
+            <CardTitle>{dish.name}</CardTitle>
+            <CardText>{dish.description}</CardText>              
+          </CardBody>
+                       
+        </Card>
       );
     else return <div></div>;
   }
-  renderComments(com) {
-    if (com != null && com.length > 0) {
+  renderComments() {
+    const dish = this.props.dishes[this.props.selectedDish];
+    const comments = this.props.comments.filter(
+      (comment) => comment.dishId === dish.id
+    );
+    if (dish != null) {
       return (
-        <div className="col-12 col-md-5 mx-1 my-1">
-          <h4>Comments</h4>
-          <ul className="list-unstyled">
-            {com.map((cmt) => {
-              return (
-                <li key={cmt.id}>
-                  <p>{cmt.comment}</p>
-                  <p>
-                    -- {cmt.author},
+        <Card>
+          <CardTitle>
+            <h4>Comments</h4>
+          </CardTitle>
+          <CardBody className="ps-0 m-0">
+            <ul className="list-group list-group-flush list-unstyled">
+              {comments.map((comment) => {
+                return (
+                  <li
+                    key={comment.id}
+                    className="list-group-item list-untiled ps-0 m-0"
+                  >
+                    {comment.comment}
+                    <br />
+                    {"--" + comment.author + ", "}
                     {new Intl.DateTimeFormat("en-US", {
                       year: "numeric",
                       month: "short",
                       day: "2-digit",
-                    }).format(new Date(Date.parse(cmt.date)))}
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+                    }).format(new Date(Date.parse(comment.date)))}
+                  </li>
+                );
+              })}
+            </ul>
+          </CardBody>
+        </Card>
       );
     } else return <div></div>;
   }
 
   render() {
+    const dish = this.props.dishes[this.props.selectedDish];
     return (
-      <div className="row">
-        {this.renderDish(this.props.dish)}
-        {this.renderComments(this.props.comment)}
+      <div className="container">
+        <div className="row">
+          <Breadcrumb>
+            <BreadcrumbItem>
+              <Link to="/menu">Menu</Link>
+            </BreadcrumbItem>
+            <BreadcrumbItem active>{dish.name}</BreadcrumbItem>
+          </Breadcrumb>
+          <div className="col-12">
+            <h3>{dish.name}</h3>
+            <hr />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-12 col-md-5 mx-1 my-1">{this.renderDish()}</div>
+          <div className="col-12 col-md-5 mx-1 my-1">
+            {this.renderComments()}
+          </div>
+        </div>
       </div>
     );
   }
